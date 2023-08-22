@@ -10,6 +10,7 @@ async function hashPassword(password) {
     return await bcrypt.hash(password + SECRET, salt);
 }
 
+
 async function comparePassword(password, hashedPassword) {
     const result = await bcrypt.compare(password + SECRET, hashedPassword);
 

@@ -5,9 +5,18 @@ async function userLoginAdapter(req, res, next) {
     const { email } = req.params;
     const { password } = req.body;
 
-    // TODO
-
-    req.user = null;
+    const selectedUser = await UserController.findByEmail(email);
+    const hashedPassword = selectedUser?.password;
+    try{
+        const senhaCorreta = await comparePassword(password,hashedPassword);
+        if(senhaCorreta){
+            req.user = selectedUser;
+        } else{
+            req.user = null;
+        }
+    } catch(error){
+        req.user = null;
+    }
 
     next();
 };

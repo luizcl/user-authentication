@@ -1,11 +1,23 @@
 const { hashPassword } = require("../services/encryptPassword");
 
+function isValidUser(user){
+    return Object.values(user).every(value => value != null && value != '')
+}
+
 async function userCreationAdapter(req, res, next) {
     const { user } = req.body;
 
-    // TODO
+    if(!user) throw new Error();
 
-    const encryptedUser = null;
+    if(!isValidUser(user)) throw new Error();
+
+    const encryptedPassword = await hashPassword(user.password);
+    const encryptedUser = {
+        ...user,
+        password: encryptedPassword
+    };
+
+    console.log(encryptedUser);
 
     req.encryptedUser = encryptedUser;
 

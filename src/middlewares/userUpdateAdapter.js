@@ -5,9 +5,20 @@ async function userUpdateAdapter(req, res, next) {
     const { id } = req.params;
     const { firstName, lastName, password } = req.body;
 
-    // TODO
+    let selectedUser = await UserController.findById(id);
+    if(selectedUser){
+        if(!password){
+            selectedUser.firstName = firstName;
+            selectedUser.lastName = lastName;
+        } else{
+            selectedUser.password = await hashPassword(password);
+        }
+        console.log('SELEÇÃO: ')
+        console.log(selectedUser);
+        await UserController.updateUserInfo(id, selectedUser)
+    }
 
-    req.updatedUser = null;
+    req.updatedUser = selectedUser;
 
     next();
 }

@@ -4,18 +4,16 @@ const { UserController } = require('../controllers/UserController');
 const { userUpdateAdapter } = require('../middlewares/userUpdateAdapter');
 const { userCreationAdapter } = require('../middlewares/userCreationAdapter');
 const { userLoginAdapter } = require('../middlewares/userLoginAdapter');
-
+ 
 router.get('/users/:email', async (req, res) => {
     const { email } = req.params;
 
     try {
-        // TODO
-        const selectedUser = {};
+        const selectedUser = await UserController.findByEmail(email);
 
         if (!selectedUser) {
             throw new Error();
         }
-
         return res.status(200).json(selectedUser);
     } catch (error) {
         console.log(error);
@@ -24,20 +22,26 @@ router.get('/users/:email', async (req, res) => {
 });
 
 router.post('/login/:email', userLoginAdapter, async (req, res) => {
-    const user = req.user;
-
-    return res.status(200).json(user);
+    try{
+        if(req.user)
+            return res.status(200).json(req.user);
+        else{
+            throw new Error();
+        }
+    } catch(error){
+        console.log(error);
+        return res.status(404).end();
+    }
 });
 
 router.post('/users', userCreationAdapter, async (req, res) => {
     const encryptedUser = req.encryptedUser;
 
     try {
-        // TODO
-
         if(!encryptedUser) throw new Error();
+        await UserController.createUser(encryptedUser);
 
-        return res.status(201).json({});
+        return res.status(201).json(encryptedUser);
     } catch (error) {
         console.log(error);
         return res.status(400).end();
@@ -45,12 +49,7 @@ router.post('/users', userCreationAdapter, async (req, res) => {
 });
 
 router.put('/users/:id', userUpdateAdapter, async (req, res) => {
-    const { id } = req.params;
-    const updatedUser = req.updatedUser;
-
     try {
-        // TODO
-
         return res.status(202).end();
     } catch (error) {
         console.log(error);
@@ -63,7 +62,7 @@ router.delete('/users/:id', async (req, res) => {
 
     try {
 
-        // TODO
+        await UserController.deleteUser(id);
 
         return res.status(204).end();
     } catch (error) {
